@@ -9,18 +9,20 @@ namespace fms {
 	// f(x) = f(a) + f'(a)(x - a)
 	//        + sum_{i > 0, x[i] < a} f''(x[i]) max{x[i] - x, 0}
 	//        + sum_{i < n-1, x[i] > a} f''(x[i]) max{x - x[i], 0}.
-	template<class X = double, class Y = double, class F = std::common_type<X,Y>>
-	inline void pwlinear_coefficients(const X& a, size_t n, const X* x, const Y* y, F* f)
+	// Return i such that x[i] < a < x[i+1]
+	template<class X = double>
+	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
 		//!!! implement
+		return 0;
 	}
 
 	// Expected value of payoff.
 	// E[f(X)] = f(a) + f'(a)(E[X] - a) 
 	//           + sum_{x < a} f''(x[i]) p[i]
-	//           + sum_{x > a} f''(x[i]) c[i].
-	template<class X = double, class Y = double, class F = std::common_type<X, Y>>
-	inline F pwlinear_value(const X& EX_a, size_t n, const F* f, const V* p, const V* c)
+	//           + sum_{a < x} f''(x[i]) c[i].
+	template<class X = double>
+	inline X pwlinear_value(const X& EX_a, size_t n, const X* f, size_t i, const X* p, const X* c)
 	{
 		return 0; //!!! implement
 	}
