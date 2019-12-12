@@ -1,6 +1,8 @@
 // pwlinear.h - Fit a piecewise linear curve.
 #pragma once
-
+#include <numeric>   
+#include <vector>
+#include "xll12/xll/ensure.h"
 namespace fms {
 
 	// Given a p.w. linear curve find the Carr-Madan coefficients.
@@ -14,8 +16,40 @@ namespace fms {
 	template<class X = double>
 	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
-		//!!! implement
-		return 0;
+		ensure(n >= 2);
+		std::vector<X> f_array(n);
+		for (size_t q = 1; q < n; ++q) {
+
+			size_t z0, z1;
+			size_t z = std::lower_bound(x, x + n, a) - x;
+
+			if (z == n) {
+				z0 = n - 2;
+				z1 = n - 1;
+			}
+			else if ( z== 0) {
+				z0 = 0;
+				z1 = 1;
+			}
+			else {
+				z0 = z - 1;
+				z1 = z;
+			}
+			f_array[z] = (y[z0] - y[z1]) / (x[z0] - x[z1]);
+		}
+
+		for (size_t i = 1; i < n - 1; ++i) {
+			f_array[i] = f_array[i + 1] - f_array[i];
+		}
+		//Return i such that x[i] < a < x[i+1]
+		size_t i=1;
+		while (x[i]<a){
+				i = i + 1;
+		}
+		f = &f_array[0];
+
+
+		return i;
 	}
 
 	// Expected value of payoff.
@@ -27,6 +61,16 @@ namespace fms {
 	template<class X = double>
 	inline X pwlinear_value(size_t n, const X* f, size_t i, const X* p, const X* c)
 	{
-		return 0; //!!! implement
+		
+		X e_value = f[0] ;
+		for (size_t j = 1; j < n - 1 && j <= i; ++j) {
+			e_value += f[j] * p[j];
+		}
+		for (size_t j = n - 2; j > 0 && j > i; --j) {
+			e_value += f[j] * c[j];
+			
+		}
+		
+		return e_value; //!!! implement
 	}
 }
