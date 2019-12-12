@@ -1,5 +1,7 @@
 // pwlinear.h - Fit a piecewise linear curve.
 #pragma once
+#include<cmath>
+using namespace std;
 
 namespace fms {
 
@@ -15,34 +17,44 @@ namespace fms {
 	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
 		//!!! implement
-		ensure(n >= 2);
-		std::vector<X>array_f(n);
-		for (size_t i = 1; i <= n - 1; ++i) {
-			size_t t0, t1;
-			size_t t = std::lower_bound(x, x + n, a) - x;
-			if (t == 0) {
-				t0 = 0;
-				t1 = 1;
-			}
-			else if (t == n) {
-				t0 = n - 2;
-				t1 = n - 1;
-			}
-			else {
-				t0 = t - 1;
-				t1 = t;
-			}
-			array_f[t] = (y[t0] - y[t1]) / (x[t0] - x[t1]);
+		int a_fl = 0;
+		for (int i = 1; x[i] < a; i++) {
+			a_fl++;
 		}
-		for (size_t j = 1; j <= n - 2; ++j) {
-			array_f[j] = array_f[j + 1] - array_f[j];
+
+		//x[a_fl]< a <x[a_fl+1]
+
+		//y[a_fl]=f(a)+f'(a)(x[a_fl]-a)
+		//y[a_fl+1]=f(a)+f'(a)(x[a_fl+1]-a)
+		//because both of the sum are 0 in when taking y[a_fl] and y[a_cl]
+
+		f[n - 1] = (y[a_fl + 1] - y[a_fl]) / (x[a_fl + 1] - x[a_fl]);//f'(a) based on the formula when f(a
+		f[0] = y[a_fl] - f[n - 1] * (x[a_fl] - a);//f(a)=f(x)-f'(a)(x-a)
+
+		X sum_11;
+		X sum_12;
+
+		for (int i = a_fl - 1; i >= 0; i--) {
+			sum_11 = f[0] + f[n - 1] * (x[i] - a);
+			sum_12 = 0;
+			for (int j = i + 1; j < a_fl + 1; j++) {
+				sum_12 += f[j] * (x[j] - x[i]);
+			}
+
+			f[i + 1] = (y[i] - sum_11 - sum_12) / (x[i + 1] - x[i]);
 		}
-		size_t k = 1;
-		while (x[k] < a) {
-			k++;
+		X sum_21;
+		X sum_22;
+		for (int i = a_fl + 2; i < n - 1; i++) {
+			sum_21 = f[0] + f[n - 1] * (x[i] - a);
+			sum_22 = 0;
+			for (int j = i - 1; j > a_fl; j--) {
+				sum_22 += f[j] * (x[i] - x[j]);
+			}
+			f[i - 1] = (y[i] - sum_21 - sum_22) / (x[i] - x[i - 1]);
+
 		}
-		f = &array_f[0];
-		return k;
+		return a_fl;
 	}
 
 	// Expected value of payoff.
@@ -54,17 +66,15 @@ namespace fms {
 	template<class X = double>
 	inline X pwlinear_value(size_t n, const X* f, size_t i, const X* p, const X* c)
 	{
-		 //!!! implement
-		X exp = f[0];
-		size_t j = 1;
-		while (j <= n - 2 && j <= i) {
-			exp += f[j] * p[j];
-			j++;
+		double value = f[0];
+		for (size_t j = 0; j < i; j++) {
+			value += f[j] * p[j];
 		}
-		while (j <= n - 2 && j > i) {
-			exp += f[j] * c[j];
-			j++;
+		for (size_t j = i; j < n - 1; j++) {
+			value += f[j] * c[j];
 		}
-		return exp;
+		return 0; //!!! implement
+
 	}
 }
+
