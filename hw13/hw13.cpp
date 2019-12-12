@@ -54,5 +54,7 @@ double WINAPI xll_pwlinear_value(_FP12* x1, _FP12* y1, double f, _FP12* p1, _FP1
 	size_t i = pwlinear_coefficients(f, n, x, y, coefficient);
 	double result = pwlinear_value(n, coefficient, i, p, c);
 	return result;
+
+
 }
 
