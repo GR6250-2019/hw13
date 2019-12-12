@@ -62,7 +62,7 @@ namespace fms {
 		if (i >= 1 )
 		{
 			size_t j = 1;
-			while (j<=n-2 && j<i)
+			while (j<=n-2 && j<=i)
 			{
 				payoff += f[j] * p[j];
 				j++;
