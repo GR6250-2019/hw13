@@ -15,6 +15,10 @@ namespace fms {
 	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
 		//!!! implement
+		f[0] += 0*y[0];
+		for (int i = 1;i<(n-1); i++) {
+			if (x[i] < a && a < x[i + 1]) return i;
+		}
 		return 0;
 	}
 
@@ -27,6 +31,12 @@ namespace fms {
 	template<class X = double>
 	inline X pwlinear_value(size_t n, const X* f, size_t i, const X* p, const X* c)
 	{
-		return 0; //!!! implement
+		X result = f[0];
+		int j;
+		for (j = 1; j <= i; j++)
+			result += f[j] * p[j];
+		for (; j < n; j++)
+			result += f[j] * c[j];
+		return result; //!!! implement
 	}
 }
