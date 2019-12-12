@@ -13,7 +13,7 @@ namespace fms {
 	//        + f'(a)(x - a).
 	// Return i such that x[i] < a < x[i+1]
 	template<class X = double>
-	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
+	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* farray)
 	{
 		//!!! implement
 		size_t i = 0;
@@ -24,7 +24,6 @@ namespace fms {
 				i++;
 			}
 		}
-		std::vector<X> farray(n);
 		farray[0] = (y[i + 1] * (x[i] - a) - y[i] * (x[i + 1] - a)) / (x[i] - x[i + 1]);
 		farray[n-1] = (y[i + 1] - y[i]) / (x[i + 1] - x[i]);
 		for (size_t k = i; k > 0; k--)
@@ -45,7 +44,7 @@ namespace fms {
 			}
 			farray[k] = temp / (x[k+1] - x[k]);
 		}
-		f = &farray[0];
+		//f = &farray[0];
 		return i;
 	}
 

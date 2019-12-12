@@ -49,7 +49,8 @@ double WINAPI xll_pwlinear_value(_FP12* xa, _FP12* ya, double f, _FP12* pa, _FP1
 	double* p = &pa->array[0];
 	double* c = &ca->array[0];
 	double* y = &ya->array[0];
-	double* coeff=&xa->array[0];
+	std::vector<double> farray(n);
+	double* coeff = &farray[0];
 	size_t i = fms::pwlinear_coefficients(f,n,x,y,coeff);
 	double result = fms::pwlinear_value(n, coeff, i, p, c);
 	return result;
