@@ -1,5 +1,8 @@
 // pwlinear.h - Fit a piecewise linear curve.
 #pragma once
+#include <numeric>
+#include<vector>
+#include "xll12/xll/ensure.h"
 
 namespace fms {
 
@@ -14,8 +17,36 @@ namespace fms {
 	template<class X = double>
 	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
-		//!!! implement
-		return 0;
+			
+			ensure(n >= 2);
+			std::vector<X>f_array(n);
+			for (size_t i = 1; i < n; ++i){
+			size_t m0, m1;
+			size_t m = std::lower_bound(x, x + n, a) - x;
+			if (m == n) {
+				m0 = n - 2;
+				m1 = n - 1;
+				}
+			else if (m == 0) {
+				m0 = 0;
+				m1 = 1;
+				}
+			else {
+				m0 = m - 1;
+				m1 = m;
+				}
+			f_array[m] = (y[m0] - y[m1]) / (x[m0] - x[m1]);
+			}
+
+			for (size_t i = 1; i < n - 1; ++i) {
+				f_array[i] = f_array[i + 1] - f_array[i];
+
+			}
+			size_t i = 1;
+			while (x[i] < a) { i = i + 1;
+			}f = &f_array[0];
+			
+		return i;
 	}
 
 	// Expected value of payoff.
@@ -27,6 +58,19 @@ namespace fms {
 	template<class X = double>
 	inline X pwlinear_value(size_t n, const X* f, size_t i, const X* p, const X* c)
 	{
-		return 0; //!!! implement
+		X E_value = f[0];
+
+		for (size_t j = 1; j < n - 1 && j <= i; ++j) {
+
+
+			E_value += f[j] * p[j];
+		}
+
+			for (size_t j = n - 2; j > 0 && j > i; --j) {
+				E_value += f[j] * c[j];
+			}
+
+		return E_value;
+
 	}
 }
