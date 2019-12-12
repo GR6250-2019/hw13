@@ -1,5 +1,6 @@
 // pwlinear.h - Fit a piecewise linear curve.
 #pragma once
+#include <vector>
 
 namespace fms {
 
@@ -15,7 +16,37 @@ namespace fms {
 	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
 		//!!! implement
-		return 0;
+		size_t i = 0;
+		if (n>=3)
+		{
+			while (i+1<=n-2 &&  x[i+1]<a)
+			{
+				i++;
+			}
+		}
+		std::vector<X> farray(n);
+		farray[0] = (y[i + 1] * (x[i] - a) - y[i] * (x[i + 1] - a)) / (x[i] - x[i + 1]);
+		farray[n-1] = (y[i + 1] - y[i]) / (x[i + 1] - x[i]);
+		for (size_t k = i; k > 0; k--)
+		{
+			X temp = y[k - 1] - y[k] - farray[n-1] * (x[k - 1] - x[k]);
+			for (size_t j = i; j > k; j--)
+			{
+				temp -= farray[j] * (x[k] - x[k - 1]);
+			}
+			farray[k] = temp / (x[k] - x[k - 1]);
+		}
+		for (size_t k = i+1; k<=n-2; k++)
+		{
+			X temp = y[k +1] - y[k] - farray[n-1] * (x[k +1] - x[k]);
+			for (size_t j = i+1; j <k; j++)
+			{
+				temp -= farray[j] * (x[k+1] - x[k]);
+			}
+			farray[k] = temp / (x[k+1] - x[k]);
+		}
+		f = &farray[0];
+		return i;
 	}
 
 	// Expected value of payoff.
@@ -27,6 +58,23 @@ namespace fms {
 	template<class X = double>
 	inline X pwlinear_value(size_t n, const X* f, size_t i, const X* p, const X* c)
 	{
-		return 0; //!!! implement
+		X payoff = f[0];
+		if (i >= 1 )
+		{
+			size_t j = 1;
+			while (j<=n-2 && j<i)
+			{
+				payoff += f[j] * p[j];
+				j++;
+			}
+			while (j<=n-2 && j>i)
+			{
+				payoff += f[j] * c[j];
+				j++;
+			}
+		}
+		return payoff; 
 	}
+	 
+	
 }
