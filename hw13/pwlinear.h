@@ -15,7 +15,34 @@ namespace fms {
 	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
 		//!!! implement
-		return 0;
+		ensure(n >= 2);
+		std::vector<X>array_f(n);
+		for (size_t i = 1; i <= n - 1; ++i) {
+			size_t t0, t1;
+			size_t t = std::lower_bound(x, x + n, a) - x;
+			if (t == 0) {
+				t0 = 0;
+				t1 = 1;
+			}
+			else if (t == n) {
+				t0 = n - 2;
+				t1 = n - 1;
+			}
+			else {
+				t0 = t - 1;
+				t1 = t;
+			}
+			array_f[t] = (y[t0] - y[t1]) / (x[t0] - x[t1]);
+		}
+		for (size_t j = 1; j <= n - 2; ++j) {
+			array_f[j] = array_f[j + 1] - array_f[j];
+		}
+		size_t k = 1;
+		while (x[k] < a) {
+			k++;
+		}
+		f = &array_f[0];
+		return k;
 	}
 
 	// Expected value of payoff.
@@ -27,6 +54,17 @@ namespace fms {
 	template<class X = double>
 	inline X pwlinear_value(size_t n, const X* f, size_t i, const X* p, const X* c)
 	{
-		return 0; //!!! implement
+		 //!!! implement
+		X exp = f[0];
+		size_t j = 1;
+		while (j <= n - 2 && j <= i) {
+			exp += f[j] * p[j];
+			j++;
+		}
+		while (j <= n - 2 && j > i) {
+			exp += f[j] * c[j];
+			j++;
+		}
+		return exp;
 	}
 }
