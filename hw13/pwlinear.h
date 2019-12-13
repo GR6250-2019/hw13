@@ -1,5 +1,6 @@
 // pwlinear.h - Fit a piecewise linear curve.
 #pragma once
+#include<vector>
 
 namespace fms {
 
@@ -15,7 +16,27 @@ namespace fms {
 	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
 		//!!! implement
-		return 0;
+		size_t i = 0;
+		for (i = 0 ;i < n; i++)
+			if (a > x[i] && a < x[i + 1])
+				break;
+		f[n - 1] = (y[i + 1] - y[i]) / (x[i + 1] - x[i]);
+		for (size_t j = i; j > 0; j--) {
+			X temp = y[j - 1] - y[j] - f[n - 1] * (x[j - 1] - x[j]);
+			for (size_t k = i; k > j; k--) {
+				temp = temp - f[k] * (x[j] - x[j - 1]);
+			}
+			f[j] = temp / (x[j] - x[j - 1]);
+		}
+
+		for (size_t j = i + 1; j <= n - 2; j++) {
+			X temp = y[j + 1] - y[j] - f[n - 1] * (x[j + 1] - x[j]);
+			for (size_t k = i + 1; k < j; k++) {
+				temp = temp - f[k] * (x[j + 1] - x[j]);
+			}
+			f[j] = temp / (x[j + 1] - x[j]);
+		}
+		return i;
 	}
 
 	// Expected value of payoff.
@@ -27,6 +48,14 @@ namespace fms {
 	template<class X = double>
 	inline X pwlinear_value(size_t n, const X* f, size_t i, const X* p, const X* c)
 	{
-		return 0; //!!! implement
+		X result = f[0];
+		for (size_t j = 1; j <= i && j <= n - 2; j++) {
+			result = result + f[j] * p[j];
+		}
+		for (size_t j = i + 1; j <= n - 2; j++) {
+			result = result + f[j] * c[j];
+		}
+
+		return result; //!!! implement
 	}
 }
