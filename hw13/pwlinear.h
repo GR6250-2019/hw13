@@ -35,7 +35,7 @@ namespace fms {
 		int j;
 		for (j = 1; j <= i; j++)
 			result += f[j] * p[j];
-		for (; j < n; j++)
+		for (; j < (n-1); j++)
 			result += f[j] * c[j];
 		return result; //!!! implement
 	}
