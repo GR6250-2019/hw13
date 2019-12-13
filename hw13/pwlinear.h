@@ -44,10 +44,10 @@ namespace fms {
 	{
 		X v = f[0];
 
-		for (size_t j = 1;  j < i; ++j) {
+		for (size_t j = 1;  j <= i; ++j) {
 			v += f[j] * p[j];
 		}
-		for (size_t j = i; j < n - 1; ++j) {
+		for (size_t j = i + 1; j < n - 1; ++j) {
 			v += f[j] * c[j];
 		}
 
