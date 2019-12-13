@@ -1,6 +1,7 @@
 // pwlinear.h - Fit a piecewise linear curve.
 #pragma once
 
+
 namespace fms {
 
 	// Given a p.w. linear curve find the Carr-Madan coefficients.
@@ -12,10 +13,46 @@ namespace fms {
 	//        + f'(a)(x - a).
 	// Return i such that x[i] < a < x[i+1]
 	template<class X = double>
-	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
+
+	inline size_t pwlinear_coef(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
-		//!!! implement
-		return 0;
+		int i;
+		int loc=0;
+		for (i = 0;i < n-1;i++) {
+			loc = 0;
+			if (x[i] < a && a < x[i + 1]) {
+				loc = i;
+			}
+			else if (x[i] == a) {
+				loc = i;
+			}
+		}
+		f[n - 1] = (y[loc] - y[loc + 1]) / (x[loc] - x[loc + 1]);
+		f[0] = y[loc] - f[n - 1] * (x[loc] - a);
+		
+		X tempds = 0;
+		X diff = 0;
+		for (i = loc;i > 0;i--) {
+			tempds = 0;
+			diff = x[i - 1] - x[i];
+			
+			for (int j = i+1;j <= loc; j++) {
+				tempds += f[j] *diff;
+			}
+			f[i] = ((y[i] - y[i - 1]) - f[n - 1] * (-diff) - tempds) / diff;
+		}
+
+		for (i = loc+1; i < n-1; i++) {
+			tempds = 0;
+			diff = x[i + 1] - x[i];
+
+			for (int j = i - 1;j >= loc+1; j--) {
+				tempds += f[j] * diff;
+			}
+			f[i] = ((y[i+1] - y[i]) - f[n - 1] * diff - tempds) / diff;
+		}
+	
+		return loc;
 	}
 
 	// Expected value of payoff.
@@ -27,6 +64,19 @@ namespace fms {
 	template<class X = double>
 	inline X pwlinear_value(size_t n, const X* f, size_t i, const X* p, const X* c)
 	{
-		return 0; //!!! implement
+		X result = 0;
+		for (int j = 0;j < n-1;j++) {
+			if (j == 0) {
+				result += f[0];
+			}
+			else if(j<i) {
+				result += f[j] * p[j];
+			}
+			else if (j > i) {
+				result += f[j] * c[j];
+			}
+			
+		}
+		return result; //!!! implement
 	}
 }
