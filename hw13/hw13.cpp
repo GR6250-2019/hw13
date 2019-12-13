@@ -65,8 +65,14 @@ double WINAPI xll_pwlinear_value(_FP12* px, _FP12* py, double f, _FP12* pp, _FP1
 #ifdef _DEBUG
 
 test test_pwlinear_value([] {
-    // !!!put tests here!!!
-
+// Butterfly
+    double eps = std::numeric_limits<double>::epsilon();
+    xll::FP12 x({ 0, 1, 2, 3, 4 });
+    xll::FP12 y({ 0, 0, 1, 0, 0 });
+    xll::FP12 p({ 0, 0, 0, 0, 0 });
+    xll::FP12 c({ 0., .1, .2, .3, 0. });
+    double v = xll_pwlinear_value(x.get(), y.get(), 0., p.get(), c.get());
+    ensure(fabs(v - (.1 - 2 * .2 + .3)) <= eps);
     });
 
 #endif

@@ -14,9 +14,9 @@ namespace fms {
 	template<class X = double>
 	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
-		size_t i0 = n;
+		size_t i0 = (a <= x[0]) ? 0 : n;
 
-		for (size_t i = 1; i < n - 1; ++i) {
+		for (size_t i = 1; i < n; ++i) {
 			// first derivative
 			f[i] = (y[i] - y[i - 1]) / (x[i] - x[i - 1]);
 			if (x[i] < a && a < x[i + 1]) {
