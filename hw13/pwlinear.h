@@ -14,8 +14,23 @@ namespace fms {
 	template<class X = double>
 	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
-		//!!! implement
-		return 0;
+		size_t i0 = n;
+
+		for (size_t i = 1; i < n - 1; ++i) {
+			// first derivative
+			f[i] = (y[i] - y[i - 1]) / (x[i] - x[i - 1]);
+			if (x[i] < a && a < x[i + 1]) {
+				i0 = i;
+				f[0] = y[i] + f[i] * (a - x[i]);
+				f[n - 1] = f[i];
+			}
+		}
+		for (size_t i = 1; i < n - 1; ++i) {
+			// second derivative
+			f[i] = f[i + 1] - f[i];
+		}
+		
+		return i0;
 	}
 
 	// Expected value of payoff.
@@ -27,6 +42,15 @@ namespace fms {
 	template<class X = double>
 	inline X pwlinear_value(size_t n, const X* f, size_t i, const X* p, const X* c)
 	{
-		return 0; //!!! implement
+		X v = f[0];
+
+		for (size_t j = 1;  j < i; ++j) {
+			v += f[j] * p[j];
+		}
+		for (size_t j = i; j < n - 1; ++j) {
+			v += f[j] * c[j];
+		}
+
+		return v; //!!! implement
 	}
 }
