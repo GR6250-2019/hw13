@@ -14,8 +14,39 @@ namespace fms {
 	template<class X = double>
 	inline size_t pwlinear_coefficients(const X& a, size_t n, const X* x, const X* y, X* f)
 	{
+		int i_ = 0;
+		for (int i = 1; i < n - 1; i++) {
+			if ((x[i] <= a) && (x[i + 1] > a)) {
+				i_ = i;
+			}
+		}
+
+		f[n-1] = (y[i_] - y[i_ + 1])/(x[i_] - x[i_ + 1]);
+		f[0] = y[i_] - f[n-1]*(x[i_] - a);
+
+		X sum = 0;
+		X dx =0;
+
+
+		for (int i = i_; i > 0; i--) {
+			sum = 0;
+			dx = x[i-1] - x[i];
+			for (int j = i + 1; j <= i_; j++) {
+				sum = sum + f[j] * dx;
+			}
+			f[i] = (y[i] - y[i - 1] - f[n - 1] * (-dx) - sum) / dx;
+		}
+
+		for (int i = i_ + 1; i < n - 1; i++) {
+			sum = 0;
+			dx = x[i + 1] - x[i];
+			for (int j = i - 1; j >= i_ + 1; j--) {
+				sum = sum + f[j] * dx;
+			}
+			f[i] = (y[i + 1] - y[i] - f[n - 1] * dx - sum) / dx;
+		}
 		//!!! implement
-		return 0;
+		return i_;
 	}
 
 	// Expected value of payoff.
@@ -27,6 +58,15 @@ namespace fms {
 	template<class X = double>
 	inline X pwlinear_value(size_t n, const X* f, size_t i, const X* p, const X* c)
 	{
-		return 0; //!!! implement
+		double E = f[0];
+		for (int j = 1; j < n; j++) {
+			if (j <= i) {
+				E = E + f[j] * p[j];
+			}
+			else {
+				E = E + f[j] * c[j];
+			}
+		}
+		return E; //!!! implement
 	}
 }
